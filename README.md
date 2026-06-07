@@ -29,7 +29,7 @@ This project builds a predictive model for CYP3A4 enzyme inhibition from molecul
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/cyp3a4-prediction.git
+git clone https://github.com/RajaniDutt/CYP3A4-Inhibition-Prediction.git
 cd cyp3a4-prediction
 ```
 
@@ -47,6 +47,11 @@ pip install pandas numpy scikit-learn rdkit matplotlib seaborn joblib mapie
 ## How to Run the Pipeline
 
 Execute the scripts in this order to reproduce the full analysis:
+### 1. Data Cleaning
+```bash
+python PreProcessing.py
+```
+Cleans up the raw data set.
 
 ### 1. Data Preparation
 ```bash
@@ -58,7 +63,7 @@ Splits raw data into train/validation/test sets using Butina-Murcko scaffold clu
 ```bash
 python feature_generation.py
 ```
-Generates Morgan fingerprints (2049 bits) and RDKit molecular descriptors (183 features).
+Generates Morgan fingerprints (2049 bits) and RDKit molecular  descriptors (183 features).
 
 ### 3. Train Random Forest Models
 ```bash
@@ -82,8 +87,6 @@ Generates out-of-fold predictions from both RFs on training set (needed for meta
 ### 6. Meta-Learner Training & Tuning (Stacking)
 ```bash
 python meta_learner.py
-```
-```bash
 python tune_meta.py
 ```
 Trains and tunes logistic regression meta-learner using grid search over regularization strength (C). Evaluates on validation set and saves best model. Output: optimized ensemble with AUPRC ~0.72 on test set.
@@ -104,7 +107,7 @@ Analyzes top 10 scaffolds by activity rate and generates SAR visualizations.
 
 ### Full Pipeline (One Command)
 ```bash
-python splitting.py && python feature_generation.py && python tune.py && python RF_Morgan.py && python RF_RDkit.py && python oof_predictions.py && python meta_learner.py && python tune_meta.py && python uncertinity.py && python sar_analysis.py
+python PreProcessing.py && python splitting.py && python feature_generation.py && python RF_Morgan.py && python RF_RDkit.py && python tune.py && python oof_predictions.py && python meta_learner.py && python tune_meta.py && python uncertinity.py && python sar_analysis.py
 ```
 
 ## Data
@@ -229,4 +232,4 @@ To fully reproduce:
 ## Author
 
 Rajanigandha Dutt — MSc AI for Molecular Sciences, TU Braunschweig
-r.gdutt@gamil.com
+r.gdutt@gmail.com
