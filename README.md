@@ -199,7 +199,6 @@ Explicit SAR features showed minimal gain (0.26pp AUPRC) — already encoded in 
 ## Reproducibility
 
 All steps are deterministic:
-- Random seeds fixed (42)
 - Train/val/test splits fixed (from scaffold clustering)
 - Model hyperparameters documented
 - Output CSVs versioned
@@ -220,5 +219,5 @@ To fully reproduce:
 
 ## Author
 
-Rajanigandha Dutt — MSc AI for Molecular Sciences, TU Braunschweig
+Rajanigandha Dutt - MSc AI for Molecular Sciences, TU Braunschweig
 r.gdutt@gmail.com
