@@ -44,31 +44,59 @@ conda activate cyp3a4
 pip install pandas numpy scikit-learn rdkit matplotlib seaborn joblib mapie
 ```
 
-## Project Structure
+## How to Run the Pipeline
 
+Execute the scripts in this order to reproduce the full analysis:
+
+### 1. Data Preparation
+```bash
+python splitting.py
 ```
-cyp3a4-prediction/
-├── data/
-│   ├── train_scaffold.csv          # Training set with Murcko scaffolds
-│   ├── features/
-│   │   ├── train_morgan.csv        # Morgan fingerprints (2049 bits)
-│   │   ├── train_rdkit.csv         # RDKit descriptors (183 features)
-│   │   ├── val_morgan.csv
-│   │   ├── val_rdkit.csv
-│   │   ├── test_morgan.csv
-│   │   ├── test_rdkit.csv
-│   │   └── sar_summary.csv         # SAR analysis results
-│   └── test_conformal_output.csv   # Conformal predictions
-├── models/
-│   ├── rf_morgan_full.joblib       # Trained Random Forest (Morgan)
-│   ├── rf_rdkit_full.joblib        # Trained Random Forest (RDKit)
-│   └── logistic_meta_learner.joblib # Stacking meta-learner
-├── results/
-│   ├── sar_activity_enrichment.png # SAR visualization
-│   └── sar_descriptor_comparison.png
-├── sar_analysis.py                 # SAR analysis script
-├── README.md                        # This file
-└── PROJECT_SUMMARY.md              # Visual project overview
+Splits raw data into train/validation/test sets using Butina-Murcko scaffold clustering.
+
+### 2. Feature Generation
+```bash
+python feature_generation.py
+```
+Generates Morgan fingerprints (2049 bits) and RDKit molecular descriptors (183 features).
+
+### 3. Train Random Forest Models
+```bash
+python RF_Morgan.py
+python RF_RDkit.py
+```
+Trains separate Random Forest models on each feature set. Models are saved to `models/` folder.
+
+### 4. Meta-Learner Training (Stacking)
+```bash
+python meta_learner.py
+```
+Trains logistic regression meta-learner on out-of-fold predictions from both RFs. Output: blended predictions with AUPRC ~0.75.
+
+### 5. Out-of-Fold Predictions
+```bash
+python oof_predictions.py
+```
+Generates validation and test set predictions for model evaluation.
+
+### 6. Uncertainty Quantification
+```bash
+python uncertinity.py
+```
+Applies conformal prediction to generate calibrated confidence intervals (95% coverage target).
+
+### 7. Structure-Activity Relationship Analysis
+```bash
+python sar_analysis.py
+```
+Analyzes top 10 scaffolds by activity rate and generates SAR visualizations.
+
+**Output files:** All predictions and visualizations saved to `results/` and `data/features/` directories.
+
+### Full Pipeline (One Command)
+To run all steps sequentially:
+```bash
+python splitting.py && python feature_generation.py && python RF_Morgan.py && python RF_RDkit.py && python meta_learner.py && python oof_predictions.py && python uncertinity.py && python sar_analysis.py
 ```
 
 ## Data
@@ -171,6 +199,7 @@ Explicit SAR features showed minimal gain (0.26pp AUPRC) — already encoded in 
 ## Reproducibility
 
 All steps are deterministic:
+- Random seeds fixed (42)
 - Train/val/test splits fixed (from scaffold clustering)
 - Model hyperparameters documented
 - Output CSVs versioned
@@ -191,6 +220,5 @@ To fully reproduce:
 
 ## Author
 
-**Rajanigandha Dutt** 
-MSc AI for Molecular Sciences, TU Braunschweig
-(R.gdutt@gmail.com)
+Rajanigandha Dutt — MSc AI for Molecular Sciences, TU Braunschweig
+r.gdutt@gamil.com
