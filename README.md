@@ -19,30 +19,7 @@ This project builds a predictive model for CYP3A4 enzyme inhibition from molecul
 | **Conformal Coverage (95%)** | 97.7% |
 | **Conformal Efficiency** | 0.58 |
 
-## Installation
 
-### Requirements
-- Python 3.10+
-- conda (recommended)
-
-### Setup
-
-1. Clone the repository:
-```bash
-git clone https://github.com/RajaniDutt/CYP3A4-Inhibition-Prediction.git
-cd cyp3a4-prediction
-```
-
-2. Create conda environment:
-```bash
-conda create -n cyp3a4 python=3.10
-conda activate cyp3a4
-```
-
-3. Install dependencies:
-```bash
-pip install pandas numpy scikit-learn rdkit matplotlib seaborn joblib mapie
-```
 ## Pipeline
 
 ### 1. Feature Engineering
@@ -83,6 +60,31 @@ pip install pandas numpy scikit-learn rdkit matplotlib seaborn joblib mapie
 - **Depleted scaffolds** (<15% inhibitors):
   - Cyclohexane: 9.8%
   - Furan: 8.0%
+
+## Installation
+
+### Requirements
+- Python 3.10+
+- conda (recommended)
+
+### Setup
+
+1. Clone the repository:
+```bash
+git clone https://github.com/RajaniDutt/CYP3A4-Inhibition-Prediction.git
+cd cyp3a4-prediction
+```
+
+2. Create conda environment:
+```bash
+conda create -n cyp3a4 python=3.10
+conda activate cyp3a4
+```
+
+3. Install dependencies:
+```bash
+pip install pandas numpy scikit-learn rdkit matplotlib seaborn joblib mapie
+```
 
 ## How to Run the Pipeline
 
