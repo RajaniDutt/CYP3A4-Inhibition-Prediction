@@ -211,11 +211,11 @@ To fully reproduce:
 
 ## References
 
-- **Conformal Prediction**: Vovk et al. (2005) — Algorithmic Learning Theory
+- **Conformal Prediction**: Vovk et al. (2005) - Algorithmic Learning Theory
 - **Random Forest**: Breiman (2001)
-- **Morgan Fingerprints**: Rogers & Hahn (2010) — *Journal of Chemical Information and Modeling*
+- **Morgan Fingerprints**: Rogers & Hahn (2010) - *Journal of Chemical Information and Modeling*
 - **RDKit**: Landrum et al. (open-source cheminformatics library)
-- **Dataset**: PubChem BioAssay — CYP3A4_Veith (AID 1851)
+- **Dataset**: PubChem BioAssay - CYP3A4_Veith (AID 1851)
 
 ## Author
 
