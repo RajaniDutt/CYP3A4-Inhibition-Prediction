@@ -43,6 +43,46 @@ conda activate cyp3a4
 ```bash
 pip install pandas numpy scikit-learn rdkit matplotlib seaborn joblib mapie
 ```
+## Pipeline
+
+### 1. Feature Engineering
+
+**Morgan Fingerprints** (2049 bits)
+- Radius 2, bit length 2048
+- Captures local molecular substructure
+
+**RDKit Descriptors** (183 features)
+- Molecular weight, LogP, TPSA, topological indices, etc.
+- Complementary to fingerprints
+
+### 2. Model Training
+
+**Random Forest models** (trained separately on each feature set):
+- `rf_morgan`: 100 trees on Morgan fingerprints
+- `rf_rdkit`: 100 trees on RDKit descriptors
+- Generate probability predictions for meta-learner input
+
+**Meta-learner** (logistic regression):
+- Input: [morgan_probability, rdkit_probability]
+- Blends complementary signals from both RFs
+- Achieves AUPRC gain (+0.045 vs single best RF)
+
+### 3. Conformal Prediction
+
+**Split conformal classification** (MAPIE):
+- Calibrated on validation set
+- Provides prediction sets with guaranteed coverage
+- 95% target coverage achieved at 97.7% actual coverage
+
+### 4. Structure-Activity Relationship (SAR)
+
+- 36 scaffolds analyzed (min. 10 compounds)
+- **Enriched scaffolds** (>40% inhibitors):
+  - Benzyl: 49.3%
+  - Aniline: 42.9%
+- **Depleted scaffolds** (<15% inhibitors):
+  - Cyclohexane: 9.8%
+  - Furan: 8.0%
 
 ## How to Run the Pipeline
 
@@ -120,59 +160,6 @@ python PreProcessing.py && python splitting.py && python feature_generation.py &
 - Test: 689
 
 **Label distribution**: ~20% active (CYP3A4 inhibitors)
-
-## Pipeline
-
-### 1. Feature Engineering
-
-**Morgan Fingerprints** (2049 bits)
-- Radius 2, bit length 2048
-- Captures local molecular substructure
-
-**RDKit Descriptors** (183 features)
-- Molecular weight, LogP, TPSA, topological indices, etc.
-- Complementary to fingerprints
-
-### 2. Model Training
-
-**Random Forest models** (trained separately on each feature set):
-- `rf_morgan`: 100 trees on Morgan fingerprints
-- `rf_rdkit`: 100 trees on RDKit descriptors
-- Generate probability predictions for meta-learner input
-
-**Meta-learner** (logistic regression):
-- Input: [morgan_probability, rdkit_probability]
-- Blends complementary signals from both RFs
-- Achieves AUPRC gain (+0.045 vs single best RF)
-
-### 3. Conformal Prediction
-
-**Split conformal classification** (MAPIE):
-- Calibrated on validation set
-- Provides prediction sets with guaranteed coverage
-- 95% target coverage achieved at 97.7% actual coverage
-
-### 4. Structure-Activity Relationship (SAR)
-
-- 36 scaffolds analyzed (min. 10 compounds)
-- **Enriched scaffolds** (>40% inhibitors):
-  - Benzyl: 49.3%
-  - Aniline: 42.9%
-- **Depleted scaffolds** (<15% inhibitors):
-  - Cyclohexane: 9.8%
-  - Furan: 8.0%
-
-## How to Run
-
-### Generate SAR Analysis
-
-```bash
-python sar_analysis.py
-```
-
-Outputs:
-- `data/features/sar_summary.csv` - Scaffold activity rates
-- `results/sar_activity_enrichment.png` -  Visualization
 
 ## Model Interpretation
 
