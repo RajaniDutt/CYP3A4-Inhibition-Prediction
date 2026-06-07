@@ -81,7 +81,10 @@ Generates out-of-fold predictions from both RFs on training set (needed for meta
 
 ### 6. Meta-Learner Training & Tuning (Stacking)
 ```bash
-python tune_meta_learner.py
+python meta_learner.py
+```
+```bash
+python tune_meta.py
 ```
 Trains and tunes logistic regression meta-learner using grid search over regularization strength (C). Evaluates on validation set and saves best model. Output: optimized ensemble with AUPRC ~0.72 on test set.
 
