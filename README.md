@@ -109,7 +109,7 @@ python splitting.py && python feature_generation.py && python tune.py && python 
 
 ## Data
 
-**Source**: PubChem (AID 1851) — CYP3A4_Veith dataset
+**Source**: PubChem (AID 1851) - CYP3A4_Veith dataset
 
 **Size**: 6,883 compounds (after cleaning)
 - Training: 5,506
@@ -168,8 +168,8 @@ python sar_analysis.py
 ```
 
 Outputs:
-- `data/features/sar_summary.csv` — Scaffold activity rates
-- `results/sar_activity_enrichment.png` — Visualization
+- `data/features/sar_summary.csv` - Scaffold activity rates
+- `results/sar_activity_enrichment.png` -  Visualization
 
 ## Model Interpretation
 
