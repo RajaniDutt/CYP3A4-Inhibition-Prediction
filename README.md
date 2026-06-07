@@ -67,25 +67,31 @@ python RF_RDkit.py
 ```
 Trains separate Random Forest models on each feature set. Models are saved to `models/` folder.
 
-### 4. Meta-Learner Training (Stacking)
+### 3. Hyperparameter Tuning
 ```bash
-python meta_learner.py
+python tune.py
 ```
-Trains logistic regression meta-learner on out-of-fold predictions from both RFs. Output: blended predictions with AUPRC ~0.75.
+Optimizes Random Forest hyperparameters on validation set.
 
-### 5. Out-of-Fold Predictions
+### 5. Generate Out-of-Fold Predictions
 ```bash
 python oof_predictions.py
 ```
-Generates validation and test set predictions for model evaluation.
+Generates out-of-fold predictions from both RFs on training set (needed for meta-learner training).
 
-### 6. Uncertainty Quantification
+### 6. Meta-Learner Training & Tuning (Stacking)
+```bash
+python tune_meta_learner.py
+```
+Trains and tunes logistic regression meta-learner using grid search over regularization strength (C). Evaluates on validation set and saves best model. Output: optimized ensemble with AUPRC ~0.72 on test set.
+
+### 7. Uncertainty Quantification
 ```bash
 python uncertinity.py
 ```
-Applies conformal prediction to generate calibrated confidence intervals (95% coverage target).
+Applies conformal prediction to validation/test predictions for 95% coverage guarantee.
 
-### 7. Structure-Activity Relationship Analysis
+### 8. Structure-Activity Relationship Analysis
 ```bash
 python sar_analysis.py
 ```
@@ -94,9 +100,8 @@ Analyzes top 10 scaffolds by activity rate and generates SAR visualizations.
 **Output files:** All predictions and visualizations saved to `results/` and `data/features/` directories.
 
 ### Full Pipeline (One Command)
-To run all steps sequentially:
 ```bash
-python splitting.py && python feature_generation.py && python RF_Morgan.py && python RF_RDkit.py && python meta_learner.py && python oof_predictions.py && python uncertinity.py && python sar_analysis.py
+python splitting.py && python feature_generation.py && python tune.py && python RF_Morgan.py && python RF_RDkit.py && python oof_predictions.py && python meta_learner.py && python tune_meta.py && python uncertinity.py && python sar_analysis.py
 ```
 
 ## Data
