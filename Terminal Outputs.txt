@@ -1,0 +1,352 @@
+============================ Scaffolding and Splitting ==========================================
+
+(cyp3a4) PS C:\Users\grhdu\OneDrive\Documents\CYP> python .\splitting.py
+[17:06:26] WARNING: not removing hydrogen atom without neighbors
+0
+                                            scaffold                                             smiles
+0  O=C(COc1ccccc1)O[C@H]1CC[C@H]2C[C@@H]3c4[nH]c5...  CO[C@H]1[C@@H](C[C@@H]2CN3CCC4=C([C@H]3C[C@@H]...
+1  C1CC2CC[C@@H]3C4Cc5nonc5C[C@@H]4CC[C@H]3[C@@H]2C1  C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@]2(C)O)CC[C@@...
+2                 C(=C\SS/C=C/NCc1cncnc1)\NCc1cncnc1  CC1=NC=C(C(=N1)N)CN(C=O)/C(=C(\CCO)/SS/C(=C(/C...
+3                                           c1ccccc1     CC1=CC(=C(C(=C1NC(=O)CN(CC(=O)O)CC(=O)O)C)Br)C
+4                  O=c1nc2[nH]c3ccccc3nc-2c(=O)[nH]1  CCCC(=O)OC[C@H]([C@H]([C@H](CN1C2=C(C=C(C(=C2)...
+ Train set size: 5506, Val set size: 688, Test set size: 689
+
+ Class Balance:
+  Train set: 0.203
+  Val set: 0.276
+  Test set: 0.250
+
+ SAVED!!
+(cyp3a4) 
+
+============================== Feature Generation =================================
+
+(cyp3a4) PS C:\Users\grhdu\OneDrive\Documents\CYP> python .\feature_generation.py
+Featurizing Morgan fingerprints......
+[17:08:17] WARNING: not removing hydrogen atom without neighbors
+Morgan feature Matrix Shape - Train: (5506, 2049)
+Morgan feature Matrix Shape - Val: (688, 2049)
+Morgan feature Matrix Shape - Test: (689, 2049)
+Computing RDKit Descriptors ......
+[17:08:56] WARNING: not removing hydrogen atom without neighbors
+[17:08:56] WARNING: not removing hydrogen atom without neighbors
+RDKit Descriptor Matrix Shape - Train: (5506, 218)
+RDKit Descriptor Matrix Shape - Val: (688, 218)
+RDKit Descriptor Matrix Shape - Test: (689, 218)
+ Dropping 12 columns with NaN values: ['MaxPartialCharge', 'MinPartialCharge', 'MaxAbsPartialCharge', 'MinAbsPartialCharge', 'BCUT2D_MWHI', 'BCUT2D_MWLOW', 'BCUT2D_CHGHI', 'BCUT2D_CHGLO', 'BCUT2D_LOGPHI', 'BCUT2D_LOGPLOW', 'BCUT2D_MRHI', 'BCUT2D_MRLOW']
+ dropping 23 zero variance columns
+ Final Descriptor Count: 182
+ Descriptors feature matrix shape - train: (5506, 183)
+Feature generation and saving complete!
+(cyp3a4) PS C:\Users\grhdu\OneDrive\Documents\CYP> 
+
+============================ RF_Morgan Training =====================================
+
+(cyp3a4) PS C:\Users\grhdu\OneDrive\Documents\CYP> python .\RF_Morgan.py
+Training set shape: (5506, 2048), Class Dist : [4391 1115]
+Validation set shape: (688, 2048), Class Dist : [498 190]
+
+Training Random Forest on Morgan fingerprints...
+Training complete.
+
+── Val Results (Morgan) ──
+  AUPRC : 0.6686   ← primary metric
+  AUROC : 0.8229
+
+Classification Report (threshold = 0.5):
+               precision    recall  f1-score   support
+
+Non-inhibitor       0.86      0.85      0.85       498
+    Inhibitor       0.62      0.62      0.62       190
+
+     accuracy                           0.79       688
+    macro avg       0.74      0.74      0.74       688
+ weighted avg       0.79      0.79      0.79       688
+
+Confusion Matrix:
+[[425  73]
+ [ 72 118]]
+
+PR curve saved to results/pr_curve_morgan.png
+Model saved to models\rf_morgan.joblib
+
+
+============================ RF_RDKit Training =====================================
+
+(cyp3a4) PS C:\Users\grhdu\OneDrive\Documents\CYP> python .\RF_RDKit.py 
+Train: (5506, 182), class distribution: [4391 1115]
+Val:   (688, 182),   class distribution: [498 190]
+
+Training Random Forest on RDKit descriptors...
+Training complete.
+
+── Val Results (RDKit) ───────────────────────
+  AUPRC : 0.7285   ← primary metric
+  AUROC : 0.8641
+
+Classification Report (threshold = 0.5):
+               precision    recall  f1-score   support
+
+Non-inhibitor       0.85      0.93      0.89       498
+    Inhibitor       0.75      0.56      0.64       190
+
+     accuracy                           0.83       688
+    macro avg       0.80      0.74      0.76       688
+ weighted avg       0.82      0.83      0.82       688
+
+Confusion Matrix:
+[[462  36]
+ [ 84 106]]
+
+PR curve saved to results/pr_curve_rdkit.png
+Model saved to models\rf_rdkit.joblib
+(cyp3a4) PS C:\Users\grhdu\OneDrive\Documents\CYP> 
+
+============================= Tunning ===================================
+
+...............................
+.0min
+[CV] END max_depth=40, max_features=0.1, min_samples_leaf=8, n_estimators=700; total time= 3.0min
+[CV] END max_depth=40, max_features=0.1, min_samples_leaf=8, n_estimators=700; total time= 3.0min
+[CV] END max_depth=40, max_features=0.1, min_samples_leaf=8, n_estimators=700; total time= 3.0min
+Fitting 5 folds for each of 15 candidates, totalling 75 fits
+
+Best CV AUPRC (Morgan): 0.6333
+Best Parameters (Morgan): {'n_estimators': 200, 'min_samples_leaf': 2, 'max_features': 'sqrt', 'max_depth': 40}
+
+Best CV AUPRC (RDKit): 0.6814
+Best Parameters (RDKit): {'n_estimators': 700, 'min_samples_leaf': 2, 'max_features': 0.2, 'max_depth': 40}
+
+---- Val Results (Morgan) ----
+  AUPRC : 0.6584   primary metric
+  AUROC : 0.8109
+
+Classification Report (Morgan):
+
+               precision    recall  f1-score   support
+
+Non-Inhibitor       0.85      0.83      0.84       498
+    Inhibitor       0.58      0.63      0.60       190
+
+     accuracy                           0.77       688
+    macro avg       0.72      0.73      0.72       688
+ weighted avg       0.78      0.77      0.77       688
+
+
+Confusion Matrix (Morgan):
+
+[[412  86]
+ [ 71 119]]
+PR curve saved to results\pr_curve_tuned.png
+
+---- Val Results (RDKit) ----
+  AUPRC : 0.7315   primary metric
+  AUROC : 0.8617
+
+Classification Report (RDKit):
+
+               precision    recall  f1-score   support
+
+Non-Inhibitor       0.85      0.92      0.88       498
+    Inhibitor       0.73      0.58      0.65       190
+
+     accuracy                           0.82       688
+    macro avg       0.79      0.75      0.77       688
+ weighted avg       0.82      0.82      0.82       688
+
+
+Confusion Matrix (RDKit):
+
+[[456  42]
+ [ 79 111]]
+PR curve saved to results\pr_curve_tuned_rdkit.png
+
+================================ Meta Learner Training ===================================
+
+Meta-Learner Coefficients:
+ Morgan OOF: 3.4641
+ RDKit OOF: 5.4643
+ Intercept: -2.9989
+Meta-Learner Val AUPRC: 0.7763
+Meta-Learner Val AUROC: 0.8829
+=============================================
+Base Model Val AUPRC: morgan -- 0.6678, RDKit -- 0.7276
+Base Model Val AUROC: morgan -- 0.8165, RDKit -- 0.8614
+Precision-Recall curve saved
+Models saved
+
+======================================== SAR ANALYSIS ====================================
+
+(cyp3a4) PS C:\Users\grhdu\OneDrive\Documents\CYP> python .\sar_analysis.py
+ -- Scaffold frequency analysis --
+
+ Total unique scaffold: 1247
+
+ Top 15 scaffolds:
+scaffold
+c1ccccc1                                      1341
+c1ccc(Cc2ccccc2)cc1                             71
+C1CCCCC1                                        61
+c1ccc(Oc2ccccc2)cc1                             38
+c1ccc(Nc2ccccc2)cc1                             28
+O=C(c1ccccc1)c1ccccc1                           28
+c1ccoc1                                         25
+O=C1c2ccccc2C(=O)c2ccccc21                      24
+c1ncncn1                                        22
+c1ccc2[nH]ccc2c1                                21
+C1CO1                                           20
+c1ccc2c(c1)OCO2                                 18
+O=C1C=C2CC[C@H]3[C@@H]4CCCC4CC[C@@H]3C2CC1      18
+O=C(Nc1ccccc1)c1ccccc1                          17
+C1COCCN1                                        16
+Name: count, dtype: int64
+
+ scaffolds with >= 10 compounds: 36
+Top 10 scaffolds:
+scaffold
+c1ccccc1                      1341
+c1ccc(Cc2ccccc2)cc1             71
+C1CCCCC1                        61
+c1ccc(Oc2ccccc2)cc1             38
+c1ccc(Nc2ccccc2)cc1             28
+O=C(c1ccccc1)c1ccccc1           28
+c1ccoc1                         25
+O=C1c2ccccc2C(=O)c2ccccc21      24
+c1ncncn1                        22
+c1ccc2[nH]ccc2c1                21
+Name: count, dtype: int64
+ Total Compounds: 1341
+Inhibitors: 225
+Inhibitor rate: 16.778523489932887
+ Total Compounds: 71
+Inhibitors: 35
+Inhibitor rate: 49.29577464788732
+ Total Compounds: 61
+Inhibitors: 6
+Inhibitor rate: 9.836065573770492
+ Total Compounds: 38
+Inhibitors: 4
+Inhibitor rate: 10.526315789473685
+ Total Compounds: 28
+Inhibitors: 12
+Inhibitor rate: 42.857142857142854
+ Total Compounds: 28
+Inhibitors: 8
+Inhibitor rate: 28.571428571428573
+ Total Compounds: 25
+Inhibitors: 2
+Inhibitor rate: 8.0
+ Total Compounds: 24
+Inhibitors: 9
+Inhibitor rate: 37.5
+ Total Compounds: 22
+Inhibitors: 1
+Inhibitor rate: 4.545454545454546
+ Total Compounds: 21
+Inhibitors: 3
+Inhibitor rate: 14.285714285714286
+Ipc                             7349038.684 19939844.579 -12590805.896
+BertzCT                             337.748      315.291       22.457
+ExactMolWt                          228.557      209.990       18.567
+MolWt                               228.903      210.424       18.479
+HeavyAtomMolWt                      213.622      198.510       15.111
+NumValenceElectrons                  82.231       73.280        8.952
+LabuteASA                            93.506       85.165        8.341
+MolMR                                61.407       53.746        7.661
+SMR_VSA5                             20.708       14.180        6.528
+SlogP_VSA5                           22.012       16.627        5.385
+Ipc                              164411.254  2611680.703 -2447269.449
+BertzCT                             573.577      553.926       19.651
+HeavyAtomMolWt                      302.420      315.965      -13.544
+SMR_VSA5                             30.152       18.062       12.090
+MolWt                               324.395      334.277       -9.882
+SlogP_VSA5                           33.641       23.922        9.719
+ExactMolWt                          323.609      333.176       -9.567
+PEOE_VSA7                            45.701       36.438        9.263
+SlogP_VSA6                           45.159       53.049       -7.891
+EState_VSA9                          10.028       17.526       -7.498
+Ipc                                1194.561      604.825      589.736
+BertzCT                             201.420      127.156       74.264
+MolWt                               215.568      162.907       52.661
+HeavyAtomMolWt                      197.928      145.588       52.340
+ExactMolWt                          214.929      162.701       52.228
+LabuteASA                            89.537       69.799       19.738
+SMR_VSA10                            20.848        3.911       16.938
+SlogP_VSA12                          15.811        1.813       13.998
+NumValenceElectrons                  78.000       64.655       13.345
+EState_VSA5                           6.421       19.528      -13.107
+Ipc                                3386.213   265690.727  -262304.514
+BertzCT                             421.019      654.021     -233.002
+HeavyAtomMolWt                      193.007      392.411     -199.404
+MolWt                               204.851      402.817     -197.966
+ExactMolWt                          204.584      401.369     -196.785
+LabuteASA                            89.779      135.268      -45.489
+NumValenceElectrons                  76.000      108.176      -32.176
+SlogP_VSA12                           2.900       29.426      -26.526
+SMR_VSA10                            11.431       36.708      -25.277
+EState_VSA8                           3.248       25.028      -21.780
+Ipc                               18134.523   296702.043  -278567.520
+BertzCT                             438.172      561.883     -123.711
+HeavyAtomMolWt                      204.289      259.992      -55.703
+MolWt                               220.417      275.742      -55.325
+ExactMolWt                          220.209      275.285      -55.075
+LabuteASA                            98.931      123.043      -24.112
+PEOE_VSA6                            23.224       40.345      -17.120
+EState_VSA7                          37.986       21.121       16.865
+NumValenceElectrons                  84.500       99.500      -15.000
+SMR_VSA1                              1.641       15.875      -14.234
+Ipc                               15757.408    46661.962   -30904.553
+PEOE_VSA6                            10.553       35.245      -24.691
+BertzCT                             562.949      582.268      -19.319
+MolWt                               243.754      258.267      -14.514
+HeavyAtomMolWt                      231.153      245.667      -14.514
+ExactMolWt                          243.580      257.868      -14.288
+EState_VSA6                          14.538       27.816      -13.278
+TPSA                                 65.484       54.890       10.594
+VSA_EState3                          19.959       10.800        9.158
+EState_VSA5                          19.349       10.212        9.137
+Ipc                                 179.982     2602.777    -2422.795
+BertzCT                             146.807      240.635      -93.827
+TPSA                                 13.140       54.953      -41.813
+HeavyAtomMolWt                      116.109      141.653      -25.543
+ExactMolWt                          126.059      149.086      -23.026
+MolWt                               126.189      149.191      -23.001
+SMR_VSA5                             22.213        7.736       14.477
+SlogP_VSA2                            0.000       11.249      -11.249
+VSA_EState2                           0.458       10.264       -9.805
+NumValenceElectrons                  47.000       56.000       -9.000
+Ipc                             1572158.814   137799.906  1434358.908
+EState_VSA3                          20.504        9.805       10.699
+NumValenceElectrons                 107.778       98.267        9.511
+EState_VSA5                           4.718       14.155       -9.437
+TPSA                                 85.443       76.710        8.733
+MolMR                                79.454       71.661        7.793
+SMR_VSA6                             10.106        2.346        7.760
+PEOE_VSA8                            25.751       18.282        7.469
+ExactMolWt                          291.637      284.296        7.340
+MolWt                               291.944      284.755        7.189
+Ipc                               11364.398     1529.911     9834.487
+BertzCT                             346.776      273.705       73.071
+ExactMolWt                          249.111      203.991       45.120
+MolWt                               249.270      204.342       44.928
+HeavyAtomMolWt                      234.150      191.574       42.576
+SlogP_VSA6                           37.965        2.453       35.511
+SMR_VSA7                             37.965        3.316       34.648
+PEOE_VSA6                            37.965        4.350       33.615
+EState_VSA2                          37.852       13.431       24.421
+NumValenceElectrons                  96.000       73.238       22.762
+Ipc                                4500.612    44815.969   -40315.357
+MolWt                               200.224      241.849      -41.625
+ExactMolWt                          200.086      241.626      -41.539
+BertzCT                             493.739      531.970      -38.232
+HeavyAtomMolWt                      188.128      224.377      -36.249
+EState_VSA8                           3.323       21.652      -18.329
+LabuteASA                            85.138      103.122      -17.984
+NumValenceElectrons                  76.667       92.889      -16.222
+MolMR                                56.259       70.167      -13.908
+EState_VSA6                          16.506        3.509       12.997
+
+================================================================================
+...Creating visualizations...
+================================================================================
+ Saved
